@@ -137,8 +137,33 @@ portfolio-main/
 | `npm run dev` | Starts the Astro development server at `localhost:4321` |
 | `npm run build` | Builds the production-ready static assets in `/dist` |
 | `npm run preview` | Previews the production build locally before deployment |
+| `npm run deploy` | Deploys `/dist` to Cloudflare Pages via Wrangler |
+| `npm run deploy:build` | Runs build and deploys to Cloudflare Pages in one step |
 
 ---
+
+## ☁️ Cloudflare Pages Deployment
+
+### Option A: Cloudflare Dashboard (Recommended)
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/) > **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
+2. Select your repository `Sujoy-Portfolio`.
+3. Configure build settings:
+   - **Framework preset**: `Astro`
+   - **Build command**: `npm run build`
+   - **Build output directory**: `dist`
+   - **Root directory**: `/`
+4. Environment variables (optional, already pinned in `.nvmrc`):
+   - `NODE_VERSION`: `20`
+5. Click **Save and Deploy**.
+
+### Option B: Cloudflare Wrangler CLI (Direct Deploy)
+```bash
+# 1. Build the project
+npm run build
+
+# 2. Deploy directly with Wrangler
+npx wrangler pages deploy dist --project-name=sujoy-portfolio
+```
 
 ## 📬 Contact & Connect
 
