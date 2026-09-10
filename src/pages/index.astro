@@ -1,0 +1,41 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import Header from '../components/Header.astro';
+import ChatArea from '../components/ChatArea.astro';
+import ChatInput from '../components/ChatInput.astro';
+import SettingsModal from '../components/SettingsModal.astro';
+import ShareModal from '../components/ShareModal.astro';
+import ResumeModal from '../components/ResumeModal.astro';
+import LoadingScreen from '../components/LoadingScreen.astro';
+import '../styles/chatgpt.css';
+---
+
+<Layout>
+  <!-- Refresh & Initial Loading Screen Animation -->
+  <LoadingScreen />
+
+  <main class="app-container">
+    <!-- Collapsible Sidebar -->
+    <Sidebar />
+
+    <!-- Central Chat Stream & Input Area -->
+    <section class="main-chat-container">
+      <Header />
+      <ChatArea />
+      <ChatInput />
+    </section>
+
+    <!-- Modals -->
+    <SettingsModal />
+    <ShareModal />
+    <ResumeModal />
+
+    <!-- Toast Notification Anchor -->
+    <div class="toast-container" id="toastContainer"></div>
+  </main>
+
+  <script>
+    import '../scripts/chatApp.ts';
+  </script>
+</Layout>

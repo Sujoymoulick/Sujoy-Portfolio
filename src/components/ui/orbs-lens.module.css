@@ -1,0 +1,342 @@
+/* Orbs Lens Loading Indicator System */
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  vertical-align: middle;
+}
+
+.root[data-pill] {
+  padding: 6px 14px 6px 10px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Light mode: pill needs visible background & border on white */
+:global([data-theme='light']) .root[data-pill] {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.pillLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: #ececec;
+  letter-spacing: -0.2px;
+}
+
+/* Light mode: label must be dark on white background */
+:global([data-theme='light']) .pillLabel {
+  color: #1a1a1a;
+}
+
+
+.glyph {
+  position: relative;
+  display: inline-block;
+  transform-origin: center center;
+  overflow: visible;
+}
+
+/* ==========================================================================
+   Lattice (S1-S5)
+   ========================================================================== */
+.lattice {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translate(-50%, -50%) scale(var(--orb-k, 1));
+}
+
+.cell {
+  position: absolute;
+  width: 3.5px;
+  height: 3.5px;
+  border-radius: 50%;
+  background: #10a37f;
+  transform: translate(0, 0);
+  animation: cellPulse 1.6s infinite ease-in-out;
+}
+
+.cell[data-still] {
+  opacity: 0.25;
+  animation: none;
+}
+
+.lattice[data-variant="S1"] .cell {
+  animation-name: cellPulse;
+}
+
+.lattice[data-variant="S2"] .cell {
+  animation-name: cellWave;
+}
+
+.lattice[data-variant="S3"] .cell {
+  animation-name: cellOrbit;
+}
+
+.lattice[data-variant="S4"] .cell {
+  animation-name: cellColumn;
+}
+
+.lattice[data-variant="S5"] .cell {
+  animation-name: cellPulse;
+}
+
+@keyframes cellPulse {
+  0%, 100% {
+    transform: scale(0.6);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+    box-shadow: 0 0 6px #10a37f;
+  }
+}
+
+@keyframes cellWave {
+  0%, 100% {
+    transform: scale(0.7);
+    opacity: 0.25;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    background: #3b82f6;
+    box-shadow: 0 0 8px #3b82f6;
+  }
+}
+
+@keyframes cellOrbit {
+  0% {
+    opacity: 1;
+    transform: scale(1.3);
+    box-shadow: 0 0 8px #10a37f;
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes cellColumn {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.7);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* ==========================================================================
+   Ring (C1-C5)
+   ========================================================================== */
+.ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: scale(var(--orb-k, 1));
+}
+
+.ringDot {
+  position: absolute;
+  width: 3.5px;
+  height: 3.5px;
+  margin-left: -1.75px;
+  margin-top: -1.75px;
+  border-radius: 50%;
+  background: #10a37f;
+  transform: translate(var(--orb-rx), var(--orb-ry));
+  animation: ringDotPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes ringDotPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: translate(var(--orb-rx), var(--orb-ry)) scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(var(--orb-rx), var(--orb-ry)) scale(1.3);
+    box-shadow: 0 0 8px #10a37f;
+  }
+}
+
+/* ==========================================================================
+   Helix / 3D Globe (G1-G5)
+   ========================================================================== */
+.helix {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: scale(var(--orb-k, 1));
+}
+
+.helixDot {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  margin-left: -1.5px;
+  margin-top: -1.5px;
+  border-radius: 50%;
+  background: #3b82f6;
+  animation: helixDotAnim 3.2s infinite linear;
+}
+
+@keyframes helixDotAnim {
+  0% {
+    transform: translate(var(--g0x, 0px), var(--g0y, 0px));
+    opacity: var(--g0o, 1);
+  }
+  12.5% {
+    transform: translate(var(--g1x, 0px), var(--g1y, 0px));
+    opacity: var(--g1o, 1);
+  }
+  25% {
+    transform: translate(var(--g2x, 0px), var(--g2y, 0px));
+    opacity: var(--g2o, 1);
+  }
+  37.5% {
+    transform: translate(var(--g3x, 0px), var(--g3y, 0px));
+    opacity: var(--g3o, 1);
+  }
+  50% {
+    transform: translate(var(--g4x, 0px), var(--g4y, 0px));
+    opacity: var(--g4o, 1);
+  }
+  62.5% {
+    transform: translate(var(--g5x, 0px), var(--g5y, 0px));
+    opacity: var(--g5o, 1);
+  }
+  75% {
+    transform: translate(var(--g6x, 0px), var(--g6y, 0px));
+    opacity: var(--g6o, 1);
+  }
+  87.5% {
+    transform: translate(var(--g7x, 0px), var(--g7y, 0px));
+    opacity: var(--g7o, 1);
+  }
+  100% {
+    transform: translate(var(--g0x, 0px), var(--g0y, 0px));
+    opacity: var(--g0o, 1);
+  }
+}
+
+/* ==========================================================================
+   Morph (M1-M5)
+   ========================================================================== */
+.morph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  transform: scale(var(--orb-k, 1));
+}
+
+.morphDot {
+  position: absolute;
+  width: 3.5px;
+  height: 3.5px;
+  margin-left: -1.75px;
+  margin-top: -1.75px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  animation: morphMove 4s infinite ease-in-out;
+}
+
+@keyframes morphMove {
+  0%, 100% {
+    transform: translate(var(--m-1));
+    opacity: 0.9;
+  }
+  25% {
+    transform: translate(var(--m-2));
+    opacity: 0.4;
+  }
+  50% {
+    transform: translate(var(--m-3));
+    opacity: 1;
+    box-shadow: 0 0 6px #8b5cf6;
+  }
+  75% {
+    transform: translate(var(--m-4));
+    opacity: 0.5;
+  }
+}
+
+/* ==========================================================================
+   Lens (B1-B5) - Blended Optics
+   ========================================================================== */
+.lens {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  margin-top: -12px;
+  transform: scale(var(--orb-k, 1));
+}
+
+.shape {
+  position: absolute;
+  inset: 2px;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  filter: blur(1.5px);
+  animation: lensSwirl 3.6s infinite ease-in-out;
+}
+
+.shapeA {
+  background: radial-gradient(circle, rgba(16, 163, 127, 0.9) 0%, rgba(16, 163, 127, 0) 70%);
+  animation-delay: 0s;
+}
+
+.shapeB {
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.9) 0%, rgba(59, 130, 246, 0) 70%);
+  animation-delay: -1.2s;
+}
+
+.shapeC {
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.9) 0%, rgba(139, 92, 246, 0) 70%);
+  animation-delay: -2.4s;
+}
+
+.shapeD {
+  background: radial-gradient(circle, rgba(236, 72, 153, 0.8) 0%, rgba(236, 72, 153, 0) 70%);
+  animation-delay: -0.6s;
+}
+
+@keyframes lensSwirl {
+  0%, 100% {
+    transform: scale(0.85) translate(-3px, -3px);
+    opacity: 0.7;
+  }
+  33% {
+    transform: scale(1.15) translate(3px, -2px);
+    opacity: 1;
+  }
+  66% {
+    transform: scale(0.95) translate(0px, 3px);
+    opacity: 0.8;
+  }
+}

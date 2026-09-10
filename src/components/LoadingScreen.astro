@@ -1,0 +1,120 @@
+---
+import { Orb } from './ui/orbs-lens';
+---
+
+<div class="app-loading-screen" id="appLoadingScreen">
+  <div class="loading-content">
+    <div class="loading-brand-pill">
+      <Orb client:load variant="B3" size={42} pill label="Initializing SujoyGPT…" />
+    </div>
+    <div class="loading-progress-bar">
+      <div class="loading-progress-fill"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .app-loading-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background-color: var(--bg-app, #212121);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.5s ease;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  /* Light mode: clean white with a very subtle warm radial glow */
+  [data-theme='light'] .app-loading-screen {
+    background-color: #ffffff;
+    background-image: radial-gradient(
+      ellipse 60% 50% at 50% 50%,
+      rgba(16, 163, 127, 0.06) 0%,
+      rgba(59, 130, 246, 0.04) 50%,
+      transparent 100%
+    );
+  }
+
+  .app-loading-screen.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    animation: loadingFloat 2s ease-in-out infinite alternate;
+  }
+
+  @keyframes loadingFloat {
+    0%   { transform: translateY(0px); }
+    100% { transform: translateY(-4px); }
+  }
+
+  .loading-brand-pill {
+    transform: scale(1.15);
+  }
+
+  /* Progress bar track */
+  .loading-progress-bar {
+    width: 160px;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Light mode: clearly visible track */
+  [data-theme='light'] .loading-progress-bar {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  .loading-progress-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #10a37f, #3b82f6, #8b5cf6);
+    border-radius: 9999px;
+    animation: progressFill 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  }
+
+  /* Light mode: slightly brighter fill gradient */
+  [data-theme='light'] .loading-progress-fill {
+    background: linear-gradient(90deg, #0d9c6e, #2563eb, #7c3aed);
+  }
+
+  @keyframes progressFill {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(0%); }
+  }
+</style>
+
+
+<script>
+  // Hide loading screen once the document and assets are ready
+  function dismissLoadingScreen() {
+    const loader = document.getElementById('appLoadingScreen');
+    if (!loader) return;
+    
+    // Ensure minimum visual presence for smooth perception
+    setTimeout(() => {
+      loader.classList.add('fade-out');
+      setTimeout(() => {
+        loader.style.display = 'none';
+      }, 500);
+    }, 850);
+  }
+
+  if (document.readyState === 'complete') {
+    dismissLoadingScreen();
+  } else {
+    window.addEventListener('load', dismissLoadingScreen);
+  }
+</script>

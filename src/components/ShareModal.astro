@@ -1,0 +1,37 @@
+<div class="modal-backdrop" id="shareModal">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3 style="font-size: 16px; font-weight: 700;">Share Conversation</h3>
+      <button class="icon-btn" id="closeShareBtn" title="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size: 13.5px; color: var(--text-secondary); line-height: 1.5;">
+        Export or copy your conversation transcript about Sujoy Moulick's portfolio and resume.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 6px;">
+        <button class="action-btn-primary" id="copyShareLinkBtn" style="justify-content: center; width: 100%;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+          </svg>
+          <span>Copy Portfolio Link</span>
+        </button>
+
+        <button class="action-btn-secondary" id="exportMarkdownBtn" style="justify-content: center; width: 100%;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Export Conversation as Markdown (.md)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
