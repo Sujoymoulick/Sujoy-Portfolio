@@ -15,7 +15,7 @@ const STORAGE_THEME_KEY = 'sujoy_portfolio_theme_v3';
 export class ChatApp {
   private chats: ChatSession[] = [];
   private activeChatId: string = '';
-  private currentModel: string = 'sujoy-gpt-4o';
+  private currentModel: string = 'sujoy-gpt-4o'; // → openrouter/auto (Auto Free)
   private deepReasoning: boolean = false;
   private webSearch: boolean = false;
   private isGenerating: boolean = false;
@@ -168,14 +168,16 @@ export class ChatApp {
     });
 
     this.textareaEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
         e.preventDefault();
         this.handleSubmit();
       }
     });
 
     // Send Button
-    this.sendBtnEl.addEventListener('click', () => {
+    this.sendBtnEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (this.isGenerating) {
         this.stopGeneration();
       } else {
@@ -337,8 +339,10 @@ export class ChatApp {
     if (model) {
       const nameEl = document.getElementById('currentModelName');
       const badgeEl = document.getElementById('currentModelBadge');
+      const iconEl = document.getElementById('currentModelIcon');
       if (nameEl) nameEl.textContent = model.name;
       if (badgeEl) badgeEl.textContent = model.badge;
+      if (iconEl) iconEl.textContent = model.icon;
       this.deepReasoning = model.deepReasoning;
       document.getElementById('deepReasonBtn')?.classList.toggle('active', this.deepReasoning);
       this.showToast(`Switched to ${model.name}`);
@@ -346,6 +350,27 @@ export class ChatApp {
     document.querySelectorAll('.model-option-card').forEach((card) => {
       card.classList.toggle('active', card.getAttribute('data-model-id') === modelId);
     });
+  }
+
+  private updateHeaderModelDisplay(
+    actualModel?: { name: string; badge?: string; icon?: string; provider?: string },
+    isFallback?: boolean,
+    requestedModel?: { name: string }
+  ) {
+    if (!actualModel) return;
+    const nameEl = document.getElementById('currentModelName');
+    const badgeEl = document.getElementById('currentModelBadge');
+    const iconEl = document.getElementById('currentModelIcon');
+
+    if (nameEl) {
+      if (isFallback && requestedModel) {
+        nameEl.textContent = `${actualModel.name} (Fallback)`;
+      } else {
+        nameEl.textContent = actualModel.name;
+      }
+    }
+    if (badgeEl && actualModel.badge) badgeEl.textContent = actualModel.badge;
+    if (iconEl && actualModel.icon) iconEl.textContent = actualModel.icon;
   }
 
   private adjustTextareaHeight() {
@@ -439,8 +464,10 @@ export class ChatApp {
   }
 
   private handleSubmit() {
+    if (this.isGenerating) return;
     const text = this.textareaEl.value.trim();
-    if (!text || this.isGenerating) return;
+    if (!text) return;
+
     this.textareaEl.value = '';
     this.adjustTextareaHeight();
     this.updateSendButtonState();
@@ -448,6 +475,13 @@ export class ChatApp {
   }
 
   public sendMessage(userText: string) {
+    const text = (userText || '').trim();
+    if (!text || this.isGenerating) return;
+
+    // Immediately lock send state
+    this.isGenerating = true;
+    this.updateSendButtonIcon(true);
+
     let currentSession = this.chats.find((c) => c.id === this.activeChatId);
     if (!currentSession) {
       this.createNewChat();
@@ -455,13 +489,13 @@ export class ChatApp {
     }
 
     if (currentSession.messages.length === 0) {
-      currentSession.title = userText.slice(0, 32) + (userText.length > 32 ? '...' : '');
+      currentSession.title = text.slice(0, 32) + (text.length > 32 ? '...' : '');
     }
 
     const userMsg: ChatMessage = {
       id: `msg-${Date.now()}-u`,
       role: 'user',
-      content: userText,
+      content: text,
       timestamp: Date.now(),
     };
     currentSession.messages.push(userMsg);
@@ -470,32 +504,101 @@ export class ChatApp {
     this.render();
     this.scrollToBottom();
 
-    this.generateResponseStream(currentSession, userText);
+    this.generateResponseStream(currentSession, text);
   }
 
-  private generateResponseStream(session: ChatSession, userPrompt: string) {
+  private async generateResponseStream(session: ChatSession, userPrompt: string) {
+    const text = (userPrompt || '').trim();
+    if (!text) {
+      this.isGenerating = false;
+      this.updateSendButtonIcon(false);
+      return;
+    }
+
     this.isGenerating = true;
     this.updateSendButtonIcon(true);
 
-    const aiResult = generateAIAnswer(userPrompt, {
+    // ── Step 1: Try FAQ / local matching first ────────────────────────────────
+    const localResult = generateAIAnswer(text, {
       model: this.currentModel,
       deepReasoning: this.deepReasoning,
       webSearch: this.webSearch,
       lastContextTopic: session.contextTopic,
     });
 
-    if (aiResult.matchedTopic) {
-      session.contextTopic = aiResult.matchedTopic;
+    if (localResult.matchedTopic) {
+      session.contextTopic = localResult.matchedTopic;
     }
 
+    // If a local FAQ / keyword match was found, stream it immediately — no API call
+    if (!localResult.isFallback) {
+      const assistantMsg: ChatMessage = {
+        id: `msg-${Date.now()}-a`,
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now(),
+        thinking: localResult.thinking,
+        thinkingTime: localResult.thinkingTime,
+        suggestions: localResult.suggestions,
+        isStreaming: true,
+      };
+
+      session.messages.push(assistantMsg);
+      this.renderMessages(session);
+      this.scrollToBottom();
+
+      const fullContent = localResult.content;
+      let charIndex = 0;
+      const streamSpeed = 14;
+      const chunkSize = 3;
+
+      const interval = setInterval(() => {
+        if (!this.isGenerating) {
+          clearInterval(interval);
+          assistantMsg.isStreaming = false;
+          this.saveState();
+          this.renderMessages(session);
+          return;
+        }
+        charIndex += chunkSize;
+        if (charIndex >= fullContent.length) {
+          assistantMsg.content = fullContent;
+          assistantMsg.isStreaming = false;
+          clearInterval(interval);
+          this.isGenerating = false;
+          this.updateSendButtonIcon(false);
+          this.saveState();
+          this.renderMessages(session);
+          this.scrollToBottom();
+        } else {
+          assistantMsg.content = fullContent.slice(0, charIndex);
+          this.updateStreamingMessageDOM(assistantMsg.id, assistantMsg.content);
+          this.scrollToBottom();
+        }
+      }, streamSpeed);
+
+      return; // done — no OpenRouter call needed
+    }
+
+    // ── Step 2: No local match — call /api/chat (OpenRouter) ─────────────────
+
+    const modelOption = AVAILABLE_MODELS.find((m) => m.id === this.currentModel);
+    const openRouterId = modelOption?.openRouterId || 'openrouter/auto';
+
+    // Build history: previous valid messages only (excluding current user message and any placeholder/empty messages)
+    const historyMessages = session.messages
+      .filter((m) => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim().length > 0)
+      .slice(0, -1) // exclude the current user message — it's sent separately in 'message'
+      .slice(-18)   // cap at 18 turns (9 rounds) for token efficiency
+      .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content.trim() }));
+
+    // Show loading placeholder while waiting for OpenRouter
     const assistantMsg: ChatMessage = {
       id: `msg-${Date.now()}-a`,
       role: 'assistant',
-      content: '',
+      content: '⏳ Thinking...',
       timestamp: Date.now(),
-      thinking: aiResult.thinking,
-      thinkingTime: aiResult.thinkingTime,
-      suggestions: aiResult.suggestions,
+      suggestions: localResult.suggestions,
       isStreaming: true,
     };
 
@@ -503,36 +606,137 @@ export class ChatApp {
     this.renderMessages(session);
     this.scrollToBottom();
 
-    const fullContent = aiResult.content;
-    let charIndex = 0;
-    const streamSpeed = 16;
-    const chunkSize = 3;
+    // Animate the loading dots while waiting
+    const loadingDots = ['⏳ Thinking.', '⏳ Thinking..', '⏳ Thinking...', '⏳ Thinking....'];
+    let dotIndex = 0;
+    const loadingInterval = setInterval(() => {
+      dotIndex = (dotIndex + 1) % loadingDots.length;
+      this.updateStreamingMessageDOM(assistantMsg.id, loadingDots[dotIndex]);
+    }, 400);
 
-    const interval = setInterval(() => {
-      if (!this.isGenerating) {
-        clearInterval(interval);
-        assistantMsg.isStreaming = false;
-        this.saveState();
-        this.renderMessages(session);
-        return;
-      }
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          model: openRouterId,
+          history: historyMessages,
+        }),
+      });
 
-      charIndex += chunkSize;
-      if (charIndex >= fullContent.length) {
-        assistantMsg.content = fullContent;
+      clearInterval(loadingInterval);
+
+      if (!response.ok) {
+        const status = response.status;
+        const errJson = await response.json().catch(() => null);
+        let errorContent = errJson?.error || errJson?.message || '**SujoyGPT** is temporarily unavailable. Please try again later.';
+        if (status === 429) errorContent = '**SujoyGPT** is briefly busy due to high usage. Please try again in a moment.';
+        else if (status === 400 && !errJson?.error) errorContent = 'Invalid request. Please rephrase your question.';
+        else if (status === 401 || status === 403) errorContent = 'AI service is not fully configured. Core FAQ answers still work — try asking about projects, skills, or experience.';
+
+        assistantMsg.content = errorContent;
         assistantMsg.isStreaming = false;
-        clearInterval(interval);
+        assistantMsg.suggestions = localResult.suggestions;
         this.isGenerating = false;
         this.updateSendButtonIcon(false);
         this.saveState();
         this.renderMessages(session);
         this.scrollToBottom();
-      } else {
-        assistantMsg.content = fullContent.slice(0, charIndex);
-        this.updateStreamingMessageDOM(assistantMsg.id, assistantMsg.content);
-        this.scrollToBottom();
+        return;
       }
-    }, streamSpeed);
+
+      interface ApiResponseData {
+        success?: boolean;
+        message?: string;
+        content?: string;
+        error?: string;
+        requestedModel?: { id: string; name: string; provider: string; category?: string };
+        actualModel?: { id: string; name: string; provider: string; category?: string; icon?: string; badge?: string };
+        isFallback?: boolean;
+        intent?: string;
+      }
+
+      const data = (await response.json()) as ApiResponseData;
+      const aiContent = (data.message || data.content || '').trim();
+
+      if (!aiContent) {
+        assistantMsg.content = 'SujoyGPT received an empty response. Please try again.';
+        assistantMsg.isStreaming = false;
+        this.isGenerating = false;
+        this.updateSendButtonIcon(false);
+        this.saveState();
+        this.renderMessages(session);
+        return;
+      }
+
+      const reqModel = data.requestedModel;
+      const actModel = data.actualModel;
+      const isFallback = Boolean(data.isFallback);
+
+      // Update header display dynamically based on actual responding model
+      this.updateHeaderModelDisplay(actModel, isFallback, reqModel);
+
+      // Add subtle powered-by footer with actual model & provider
+      let modelFooter = '';
+      if (data.intent !== 'MODEL_IDENTITY') {
+        if (actModel) {
+          if (isFallback && reqModel) {
+            modelFooter = `\n\n---\n*Powered by OpenRouter • ${actModel.name} (${actModel.provider}) ↳ Fallback from ${reqModel.name}*`;
+          } else {
+            modelFooter = `\n\n---\n*Powered by OpenRouter • ${actModel.name} (${actModel.provider})*`;
+          }
+        } else {
+          modelFooter = `\n\n---\n*Powered by OpenRouter*`;
+        }
+      }
+
+      const fullContent = `${aiContent}${modelFooter}`;
+
+      // Stream the AI response character by character
+      assistantMsg.content = '';
+      let charIndex = 0;
+      const streamSpeed = 10;
+      const chunkSize = 5;
+
+      const streamInterval = setInterval(() => {
+        if (!this.isGenerating) {
+          clearInterval(streamInterval);
+          assistantMsg.content = fullContent;
+          assistantMsg.isStreaming = false;
+          this.saveState();
+          this.renderMessages(session);
+          return;
+        }
+        charIndex += chunkSize;
+        if (charIndex >= fullContent.length) {
+          assistantMsg.content = fullContent;
+          assistantMsg.isStreaming = false;
+          clearInterval(streamInterval);
+          this.isGenerating = false;
+          this.updateSendButtonIcon(false);
+          this.saveState();
+          this.renderMessages(session);
+          this.scrollToBottom();
+        } else {
+          assistantMsg.content = fullContent.slice(0, charIndex);
+          this.updateStreamingMessageDOM(assistantMsg.id, assistantMsg.content);
+          this.scrollToBottom();
+        }
+      }, streamSpeed);
+
+    } catch (err) {
+      clearInterval(loadingInterval);
+      console.error('[SujoyGPT] API error:', err);
+      assistantMsg.content = 'Connection error. Please check your network and try again.';
+      assistantMsg.isStreaming = false;
+      assistantMsg.suggestions = localResult.suggestions;
+      this.isGenerating = false;
+      this.updateSendButtonIcon(false);
+      this.saveState();
+      this.renderMessages(session);
+      this.scrollToBottom();
+    }
   }
 
   private stopGeneration() {
@@ -791,9 +995,12 @@ export class ChatApp {
         }
 
         if (lastUserIndex !== -1) {
-          const userPrompt = currentSession.messages[lastUserIndex].content;
+          const userPrompt = currentSession.messages[lastUserIndex].content.trim();
+          if (!userPrompt) return;
           // Trim assistant messages after this user prompt
           currentSession.messages = currentSession.messages.slice(0, lastUserIndex + 1);
+          this.isGenerating = true;
+          this.updateSendButtonIcon(true);
           this.saveState();
           this.render();
           this.generateResponseStream(currentSession, userPrompt);
@@ -1003,9 +1210,18 @@ export class ChatApp {
   }
 }
 
-// Initialize on DOM ready
+// Initialize on DOM ready (with singleton guard)
 if (typeof window !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', () => {
-    (window as any).chatApp = new ChatApp();
-  });
+  const initApp = () => {
+    if (!(window as any).__sujoyChatAppInitialized) {
+      (window as any).__sujoyChatAppInitialized = true;
+      (window as any).chatApp = new ChatApp();
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+  } else {
+    initApp();
+  }
 }

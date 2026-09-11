@@ -16,8 +16,9 @@ import { AVAILABLE_MODELS } from '../scripts/chatEngine';
     <!-- Model Selector -->
     <div class="model-selector-dropdown">
       <button class="model-select-btn" id="modelSelectBtn">
-        <span id="currentModelName">SujoyGPT-4o</span>
-        <span class="model-badge" id="currentModelBadge">Omni</span>
+        <span class="model-select-icon" id="currentModelIcon">⚡</span>
+        <span id="currentModelName">Auto Free</span>
+        <span class="model-badge" id="currentModelBadge">Auto</span>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
@@ -30,18 +31,14 @@ import { AVAILABLE_MODELS } from '../scripts/chatEngine';
             <div
               class={`model-option-card ${model.id === 'sujoy-gpt-4o' ? 'active' : ''}`}
               data-model-id={model.id}
+              data-model-icon={model.icon}
             >
-              <div class="model-option-icon">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-                  <line x1="8" y1="21" x2="16" y2="21"></line>
-                  <line x1="12" y1="17" x2="12" y2="21"></line>
-                </svg>
-              </div>
+              <div class="model-option-icon-emoji">{model.icon}</div>
               <div class="model-option-info">
                 <div class="model-option-title">
                   <span>{model.name}</span>
                   <span class="model-badge">{model.badge}</span>
+                  <span class="model-free-badge">🆓 Free</span>
                 </div>
                 <div class="model-option-desc">{model.description}</div>
               </div>

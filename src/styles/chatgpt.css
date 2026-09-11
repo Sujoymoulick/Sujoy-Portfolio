@@ -526,6 +526,29 @@ a:hover {
   color: var(--accent-green);
 }
 
+/* New emoji icon styles for updated model dropdown */
+.model-option-icon-emoji {
+  font-size: 20px;
+  margin-top: 1px;
+  line-height: 1;
+  min-width: 24px;
+}
+
+.model-select-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.model-free-badge {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: var(--radius-full);
+  background-color: rgba(16, 163, 127, 0.12);
+  color: var(--accent-green);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .model-option-info {
   display: flex;
   flex-direction: column;
@@ -538,6 +561,7 @@ a:hover {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .model-option-desc {

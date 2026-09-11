@@ -8,6 +8,55 @@ export interface InterviewQAItem {
 }
 
 export const INTERVIEW_QA_DATABASE: InterviewQAItem[] = [
+  // 0. Greeting / Hello / Hi
+  {
+    id: 'greeting',
+    question: 'Hello! How can I help you?',
+    topic: 'greeting',
+    keywords: [
+      'hi',
+      'hello',
+      'hey',
+      'hi sujoy',
+      'hello sujoy',
+      'hey sujoy',
+      'hi there',
+      'hello there',
+      'hey there',
+      'greetings',
+      'namaste',
+      'good morning',
+      'good afternoon',
+      'good evening',
+      'howdy',
+      'sup',
+      'whats up',
+      'what up',
+      'yo',
+      'wsp',
+      'hi sujoygpt',
+      'hello sujoygpt',
+      'hey sujoygpt',
+    ],
+    answer: `Hello! 👋 Welcome to **SujoyGPT**, the interactive AI assistant for **Sujoy Moulick**!
+
+I can help you explore Sujoy's background, flagship software products (like FreePDFLY and VlogToBlog), published Chrome extensions, technical stack, verified certifications, and work experience.
+
+Here are a few popular questions to get started:
+- *"Why should I hire you?"*
+- *"Tell me about your flagship projects"*
+- *"What is your core technical stack and skills?"*
+- *"Can I see your work experience and resume?"*
+
+What would you like to know?`,
+    suggestions: [
+      'Why should I hire you?',
+      'Tell me about yourself',
+      'Show flagship projects',
+      'What are your strongest technical skills?',
+      'Can I see your resume?',
+    ],
+  },
   // 1. Tell me about yourself.
   {
     id: 'tell-me-about-yourself',

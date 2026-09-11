@@ -1,5 +1,6 @@
 import { portfolioData, type ProjectItem } from '../data/portfolioData';
 import { matchInterviewQA, type MatchResult } from './qaMatcher';
+import { classifyIntent } from '../lib/ai/intent';
 
 export interface ChatMessage {
   id: string;
@@ -26,31 +27,63 @@ export interface ModelOption {
   id: string;
   name: string;
   badge: string;
+  icon: string;
   description: string;
   deepReasoning: boolean;
+  /** The real OpenRouter model ID sent to /api/chat (server-validated) */
+  openRouterId: string;
 }
 
+/**
+ * AVAILABLE_MODELS — UI model list for SujoyGPT
+ * All openRouterId values MUST be free (`:free` suffix or `openrouter/auto`).
+ * These IDs are validated server-side against src/lib/ai/models.ts allowlist.
+ */
 export const AVAILABLE_MODELS: ModelOption[] = [
   {
     id: 'sujoy-gpt-4o',
-    name: 'SujoyGPT-4o',
-    badge: 'Omni',
-    description: 'Fast, intelligent and versatile for all portfolio & interview questions',
+    name: 'Auto Free',
+    badge: 'Auto',
+    icon: '⚡',
+    description: 'Automatically selects the best available free AI model',
     deepReasoning: false,
+    openRouterId: 'openrouter/auto',
+  },
+  {
+    id: 'sujoy-general',
+    name: 'Gemma 4 31B',
+    badge: 'General',
+    icon: '🤖',
+    description: 'Google\'s open model — fast, versatile for all portfolio questions',
+    deepReasoning: false,
+    openRouterId: 'google/gemma-4-31b-it:free',
   },
   {
     id: 'sujoy-o3-mini',
-    name: 'Sujoy-o3-mini',
+    name: 'Nemotron Reasoning',
     badge: 'Reasoning',
-    description: 'Deep architectural reasoning, recruiter insights, and system design breakdowns',
+    icon: '🧠',
+    description: 'NVIDIA\'s reasoning model for complex architectural analysis',
     deepReasoning: true,
+    openRouterId: 'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
   },
   {
     id: 'sujoy-canvas',
-    name: 'Sujoy-Canvas',
-    badge: 'Code Pro',
-    description: 'Specialized in technical code samples, extensions, and implementation details',
+    name: 'Cohere Code',
+    badge: 'Coding',
+    icon: '💻',
+    description: 'Cohere\'s code model — specialized for programming and tech questions',
     deepReasoning: false,
+    openRouterId: 'cohere/north-mini-code:free',
+  },
+  {
+    id: 'sujoy-fast',
+    name: 'Nemotron Lightning',
+    badge: 'Fast',
+    icon: '🚀',
+    description: 'NVIDIA\'s ultra-fast model for quick, high-quality responses',
+    deepReasoning: false,
+    openRouterId: 'nvidia/nemotron-3.5-lightning:free',
   },
 ];
 
@@ -411,8 +444,33 @@ export function generateAIAnswer(
   thinkingTime?: number;
   suggestions: string[];
   matchedTopic?: string;
+  /** true = no local match found, caller should query OpenRouter */
+  isFallback: boolean;
 } {
   const q = query.toLowerCase().trim();
+  const intent = classifyIntent(query);
+
+  // 0. MODEL_IDENTITY, TECHNICAL, GENERAL, GREETING, AI_CAPABILITIES bypass local static FAQ to query server AI route
+  if (
+    intent === 'MODEL_IDENTITY' ||
+    intent === 'TECHNICAL' ||
+    intent === 'GENERAL' ||
+    intent === 'GREETING' ||
+    intent === 'AI_CAPABILITIES'
+  ) {
+    return {
+      content: '',
+      suggestions: [
+        'Why should I hire you?',
+        'Tell me about yourself',
+        'Show flagship projects',
+        'What are your strongest technical skills?',
+        'Can I see your resume?',
+      ],
+      isFallback: true,
+    };
+  }
+
   const isReasoning = options.deepReasoning || options.model === 'sujoy-o3-mini';
 
   let thinking: string | undefined = undefined;
@@ -442,6 +500,7 @@ export function generateAIAnswer(
         'Can I see your resume?',
       ],
       matchedTopic: matchResult.matchedItem.topic || matchResult.matchedItem.id,
+      isFallback: false,
     };
   }
 
@@ -457,6 +516,7 @@ export function generateAIAnswer(
       thinkingTime,
       suggestions: ['Tell me about Resume Generators', 'Tell me about FreePDFLY', 'Show all AI projects'],
       matchedTopic: 'vlogtoblog',
+      isFallback: false,
     };
   }
 
@@ -471,6 +531,7 @@ export function generateAIAnswer(
       thinkingTime,
       suggestions: ['Tell me about VlogToBlog', 'Tell me about FreePDFLY', 'Show tech stack'],
       matchedTopic: 'resumegenerators',
+      isFallback: false,
     };
   }
 
@@ -491,6 +552,7 @@ export function generateAIAnswer(
       thinkingTime,
       suggestions: ['Show flagship SaaS projects', 'Show client demos', 'GitHub profile & code'],
       matchedTopic: 'live-tools',
+      isFallback: false,
     };
   }
 
@@ -513,6 +575,7 @@ export function generateAIAnswer(
       thinkingTime,
       suggestions: ['Show flagship projects', 'Contact Sujoy for a freelance project', 'View full work experience'],
       matchedTopic: 'client-demos',
+      isFallback: false,
     };
   }
 
@@ -535,6 +598,7 @@ export function generateAIAnswer(
       thinkingTime,
       suggestions: ['Show AI / ML projects', 'View all 10 certifications', 'What is your tech stack?'],
       matchedTopic: 'blogs',
+      isFallback: false,
     };
   }
 
@@ -554,6 +618,7 @@ export function generateAIAnswer(
       thinkingTime,
       suggestions: ['What is your tech stack?', 'Show GitHub repositories', 'Show projects', 'How to contact Sujoy?'],
       matchedTopic: 'certifications',
+      isFallback: false,
     };
   }
 
@@ -574,6 +639,7 @@ export function generateAIAnswer(
       thinkingTime,
       suggestions: ['What are your top projects?', 'Show GitHub repositories', 'What is your college & education?'],
       matchedTopic: 'experience',
+      isFallback: false,
     };
   }
 
@@ -592,18 +658,13 @@ export function generateAIAnswer(
       thinkingTime,
       suggestions: ['What are your technical skills?', 'Show GitHub repositories', 'Show Flagship Projects'],
       matchedTopic: 'education',
+      isFallback: false,
     };
   }
 
-  // 3. Fallback when confidence < 0.45 and query is out-of-domain
+  // 3. No local match — signal chatApp to call OpenRouter
   return {
-    content: `I'm not sure I have enough information about that. You can ask me about Sujoy's skills, projects, experience, education, or career goals.
-
-Here are some helpful things you can ask:
-1. *"Why should I hire you?"* or *"Tell me about yourself"*
-2. *"What are your flagship projects like FreePDFLY and VlogToBlog?"*
-3. *"What is your technical stack across frontend, backend, and AI/ML?"*
-4. *"Can I view your verified resume and GitHub profile?"*`,
+    content: '',
     thinking,
     thinkingTime,
     suggestions: [
@@ -614,5 +675,6 @@ Here are some helpful things you can ask:
       'What are your strongest technical skills?',
       'Can I see your resume?',
     ],
+    isFallback: true,
   };
 }

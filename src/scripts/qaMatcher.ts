@@ -2,6 +2,12 @@ import { INTERVIEW_QA_DATABASE, type InterviewQAItem } from '../data/interviewQA
 
 // Common chat shortcuts, typos, and multilingual slang mappings
 const SLANG_AND_TYPO_MAP: Record<string, string> = {
+  'hii': 'hi',
+  'hiii': 'hi',
+  'helo': 'hello',
+  'hallo': 'hello',
+  'heyy': 'hey',
+  'heyyy': 'hey',
   'u': 'you',
   'ur': 'your',
   'urs': 'yours',
