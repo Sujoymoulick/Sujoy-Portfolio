@@ -1,41 +1,32 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Sidebar from '../components/Sidebar.astro';
-import Header from '../components/Header.astro';
-import ChatArea from '../components/ChatArea.astro';
-import ChatInput from '../components/ChatInput.astro';
-import SettingsModal from '../components/SettingsModal.astro';
-import ShareModal from '../components/ShareModal.astro';
-import ResumeModal from '../components/ResumeModal.astro';
-import LoadingScreen from '../components/LoadingScreen.astro';
-import '../styles/chatgpt.css';
+import ProfilePanel from '../components/ProfilePanel.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import MotionGrid from '../components/ui/motion-grid';
+import { projectsData } from '../data/projects';
+import '../styles/global.css';
 ---
 
-<Layout>
-  <!-- Refresh & Initial Loading Screen Animation -->
-  <LoadingScreen />
+<Layout title="Sujoy Moulick — Full-Stack Developer & Indie Hacker Portfolio">
+  <div class="motion-grid-bg">
+    <MotionGrid client:load speed="25s" opacity={0.08} lineColor="245, 181, 43" backgroundColor="transparent" enableGlow={false} className="w-full h-full min-h-screen" />
+  </div>
 
-  <main class="app-container">
-    <!-- Collapsible Sidebar -->
-    <Sidebar />
+  <main class="portfolio-container">
+    <div class="portfolio-layout">
+      <!-- Left Column: Complete Personal & Professional Profile -->
+      <div class="sticky-sidebar">
+        <ProfilePanel />
+      </div>
 
-    <!-- Central Chat Stream & Input Area -->
-    <section class="main-chat-container">
-      <Header />
-      <ChatArea />
-      <ChatInput />
-    </section>
-
-    <!-- Modals -->
-    <SettingsModal />
-    <ShareModal />
-    <ResumeModal />
-
-    <!-- Toast Notification Anchor -->
-    <div class="toast-container" id="toastContainer"></div>
+      <!-- Right Column: 2-Column Project Dashboard -->
+      <section class="dashboard-section" aria-label="Projects Dashboard">
+        <div class="dashboard-grid">
+          {projectsData.map((project) => (
+            <ProjectCard project={project} />
+          ))}
+        </div>
+      </section>
+    </div>
   </main>
-
-  <script>
-    import '../scripts/chatApp.ts';
-  </script>
 </Layout>

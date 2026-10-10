@@ -1,0 +1,390 @@
+---
+import { profileData } from '../data/profile';
+import ThemeToggle from './ThemeToggle.astro';
+---
+
+<aside class="profile-panel">
+  <!-- Avatar & Theme Switcher Header -->
+  <div class="avatar-header">
+    <div class="avatar-container">
+      <div class="avatar-accent-circle">
+        <img 
+          src={profileData.avatar} 
+          alt={profileData.name} 
+          class="avatar-img" 
+          loading="eager"
+        />
+      </div>
+    </div>
+    
+    <div class="toggle-wrapper">
+      <ThemeToggle />
+    </div>
+  </div>
+
+  <!-- Name & Headline -->
+  <h1 class="profile-name">{profileData.name}</h1>
+  
+  <div class="profile-meta">
+    <div class="meta-item">
+      <svg class="meta-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      <span>Jaipur, India &middot; (Ranaghat, WB)</span>
+    </div>
+    
+    <div class="meta-item">
+      <svg class="meta-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+      </svg>
+      <span>B.Tech CSE (AI & ML) &middot; UEM Jaipur</span>
+    </div>
+  </div>
+
+  <!-- Bio Intro -->
+  <div class="bio-section">
+    <p class="bio-heading">{profileData.bio}</p>
+  </div>
+
+  <!-- Key Highlight Links with Amber Underline -->
+  <div class="links-list">
+    <a href="https://github.com/Sujoymoulick" target="_blank" rel="noopener noreferrer" class="amber-link">
+      <span>My GitHub Repositories</span>
+    </a>
+    <a href="https://www.linkedin.com/in/sujoymoulick/" target="_blank" rel="noopener noreferrer" class="amber-link">
+      <span>LinkedIn Profile</span>
+    </a>
+    <a href="/Resume.pdf" target="_blank" rel="noopener noreferrer" class="amber-link">
+      <span>View Resume (PDF)</span>
+    </a>
+    <a href="https://www.freepdfly.com" target="_blank" rel="noopener noreferrer" class="amber-link">
+      <span>FreePDFly SaaS</span>
+    </a>
+  </div>
+
+  <p class="tagline">
+    Specializing in web tools, SaaS platforms, AI-powered experiments, and full-stack products.
+  </p>
+
+  <!-- Email Contact Form Action -->
+  <form action={`mailto:${profileData.email}`} method="GET" class="contact-form">
+    <input 
+      type="email" 
+      name="body"
+      placeholder="Your message / email..." 
+      required
+      class="contact-input"
+    />
+    <button type="submit" class="contact-btn">Contact</button>
+  </form>
+
+  <!-- Social Icons Row -->
+  <div class="social-icons">
+    <a href={profileData.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="social-icon">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+      </svg>
+    </a>
+
+    <a href={profileData.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-icon">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+      </svg>
+    </a>
+
+    <a href={`mailto:${profileData.email}`} aria-label="Email" class="social-icon">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+      </svg>
+    </a>
+
+    <a href="/Resume.pdf" target="_blank" rel="noopener noreferrer" aria-label="Resume" class="social-icon">
+      <svg class="icon-svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Compact Technical Skills List -->
+  <div class="skills-block">
+    <h3 class="skills-title">Core Skills</h3>
+    <div class="skills-tags">
+      {profileData.skills.map((skill) => (
+        <span class="skill-pill">{skill}</span>
+      ))}
+    </div>
+  </div>
+
+  <!-- Expandable Details Toggle -->
+  <details class="details-accordion">
+    <summary class="details-summary">Education & Experience</summary>
+    <div class="details-content">
+      <div class="detail-item">
+        <strong>Degree:</strong> B.Tech CSE (AI & ML)<br/>
+        <span>University of Engineering & Management, Jaipur (2024–2028)</span>
+      </div>
+      <div class="detail-item">
+        <strong>Roles:</strong> Technical Head at TSS Jaipur &middot; Former Backend Intern at CodeAlpha &middot; Freelance Developer
+      </div>
+    </div>
+  </details>
+</aside>
+
+<style>
+  .profile-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .avatar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Avatar with Accent Background Circle */
+  .avatar-container {
+    margin-bottom: 0;
+  }
+
+  .avatar-accent-circle {
+    width: 135px;
+    height: 135px;
+    border-radius: 50%;
+    background-color: var(--accent-amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(245, 181, 43, 0.3);
+  }
+
+  .avatar-img {
+    width: 125px;
+    height: 125px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .profile-name {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text-main);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .profile-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  .meta-icon {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    max-width: 16px !important;
+    max-height: 16px !important;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .bio-section {
+    margin-bottom: 1.25rem;
+  }
+
+  .bio-heading {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+    align-items: flex-start;
+  }
+
+  .amber-link {
+    display: inline-block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    text-decoration: underline;
+    text-decoration-color: var(--accent-amber);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+  }
+
+  .amber-link:hover {
+    color: var(--accent-amber-hover);
+    text-decoration-color: var(--accent-amber-hover);
+  }
+
+  .tagline {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.45;
+    margin: 0 0 1.25rem 0;
+  }
+
+  /* Contact Subscribe Form */
+  .contact-form {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    background-color: var(--contact-form-bg);
+    border-radius: 12px;
+    padding: 3px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--contact-form-border);
+  }
+
+  .contact-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.875rem;
+    color: var(--text-main);
+    outline: none;
+  }
+
+  .contact-input::placeholder {
+    color: var(--text-muted);
+  }
+
+  .contact-btn {
+    background-color: var(--accent-amber);
+    color: #111827;
+    font-weight: 700;
+    font-size: 0.875rem;
+    border: none;
+    padding: 0.65rem 1.1rem;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    white-space: nowrap;
+  }
+
+  .contact-btn:hover {
+    background-color: var(--accent-amber-hover);
+  }
+
+  .contact-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Social Icons */
+  .social-icons {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .social-icon {
+    color: var(--text-muted);
+    transition: color 0.15s ease, transform 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .social-icon:hover {
+    color: var(--text-main);
+    transform: translateY(-1px);
+  }
+
+  .icon-svg {
+    width: 22px !important;
+    height: 22px !important;
+    min-width: 22px !important;
+    min-height: 22px !important;
+    max-width: 22px !important;
+    max-height: 22px !important;
+  }
+
+  /* Skills Block */
+  .skills-block {
+    margin-bottom: 1.25rem;
+  }
+
+  .skills-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin: 0 0 0.6rem 0;
+  }
+
+  .skills-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+
+  .skill-pill {
+    background-color: var(--pill-bg);
+    color: var(--pill-text);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.55rem;
+    border-radius: 6px;
+    border: 1px solid var(--pill-border);
+  }
+
+  /* Expandable Accordion */
+  .details-accordion {
+    background-color: var(--accordion-bg);
+    border-radius: 10px;
+    border: 1px solid var(--pill-border);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .details-summary {
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-main);
+    user-select: none;
+  }
+
+  .details-content {
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--pill-border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .detail-item {
+    line-height: 1.4;
+  }
+</style>

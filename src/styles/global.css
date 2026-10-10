@@ -1,0 +1,131 @@
+:root {
+  --bg-color: #ffffff;
+  --text-main: #111827;
+  --text-muted: #6B7280;
+  --card-bg: rgba(255, 255, 255, 0.88);
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --card-shadow-hover: 0 12px 30px -5px rgba(0, 0, 0, 0.12);
+  --icon-box-bg: #F8F9FA;
+  --icon-box-border: rgba(0, 0, 0, 0.08);
+  --contact-form-bg: rgba(255, 255, 255, 0.9);
+  --contact-form-border: #E5E7EB;
+  --pill-bg: rgba(255, 255, 255, 0.8);
+  --pill-text: #374151;
+  --pill-border: rgba(0, 0, 0, 0.06);
+  --accordion-bg: rgba(255, 255, 255, 0.7);
+  --accent-amber: #F5B52B;
+  --accent-amber-hover: #E0A221;
+  --card-radius: 18px;
+  --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html.dark {
+  --bg-color: #0F1117;
+  --text-main: #F9FAFB;
+  --text-muted: #9CA3AF;
+  --card-bg: rgba(24, 24, 27, 0.88);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+  --card-shadow-hover: 0 12px 30px -5px rgba(0, 0, 0, 0.7);
+  --icon-box-bg: #27272A;
+  --icon-box-border: rgba(255, 255, 255, 0.12);
+  --contact-form-bg: rgba(24, 24, 27, 0.9);
+  --contact-form-border: #27272A;
+  --pill-bg: rgba(39, 39, 42, 0.8);
+  --pill-text: #E5E7EB;
+  --pill-border: rgba(255, 255, 255, 0.08);
+  --accordion-bg: rgba(24, 24, 27, 0.7);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* MotionGrid Background Layer */
+.motion-grid-bg {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Page Outer Container */
+.portfolio-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+/* Main Layout Grid */
+.portfolio-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  .portfolio-layout {
+    display: grid;
+    grid-template-columns: 310px 1fr;
+    gap: 3.5rem;
+    align-items: start;
+  }
+
+  .sticky-sidebar {
+    position: sticky;
+    top: 2.5rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .portfolio-layout {
+    grid-template-columns: 330px 1fr;
+    gap: 4rem;
+  }
+}
+
+/* Right Dashboard Project Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+::-webkit-scrollbar-thumb {
+  background: #C5C5C5;
+  border-radius: 4px;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #3F3F46;
+}

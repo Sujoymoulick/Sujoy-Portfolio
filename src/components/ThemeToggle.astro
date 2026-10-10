@@ -1,0 +1,86 @@
+---
+---
+
+<button id="themeToggleBtn" aria-label="Toggle Dark Mode" class="theme-toggle-btn">
+  <svg id="sunIcon" class="theme-icon hidden" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+  <svg id="moonIcon" class="theme-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+  </svg>
+  <span class="theme-label" id="themeLabel">Dark Mode</span>
+</button>
+
+<style>
+  .theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--card-bg);
+    color: var(--text-main);
+    border: 1px solid var(--contact-form-border);
+    padding: 0.45rem 0.85rem;
+    border-radius: 10px;
+    font-size: 0.825rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+    user-select: none;
+  }
+
+  .theme-toggle-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--accent-amber);
+  }
+
+  .theme-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--accent-amber);
+    flex-shrink: 0;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+</style>
+
+<script>
+  function initTheme() {
+    const btn = document.getElementById('themeToggleBtn');
+    const sunIcon = document.getElementById('sunIcon');
+    const moonIcon = document.getElementById('moonIcon');
+    const label = document.getElementById('themeLabel');
+
+    function updateThemeUI(isDark: boolean) {
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+        sunIcon?.classList.remove('hidden');
+        moonIcon?.classList.add('hidden');
+        if (label) label.textContent = 'Light Mode';
+      } else {
+        document.documentElement.classList.remove('dark');
+        sunIcon?.classList.add('hidden');
+        moonIcon?.classList.remove('hidden');
+        if (label) label.textContent = 'Dark Mode';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = savedTheme ? savedTheme === 'dark' : prefersDark;
+    
+    updateThemeUI(isDark);
+
+    btn?.addEventListener('click', () => {
+      const currentlyDark = document.documentElement.classList.contains('dark');
+      const nextDark = !currentlyDark;
+      localStorage.setItem('theme', nextDark ? 'dark' : 'light');
+      updateThemeUI(nextDark);
+    });
+  }
+
+  initTheme();
+  document.addEventListener('astro:after-swap', initTheme);
+</script>

@@ -1,0 +1,128 @@
+---
+interface Props {
+  dataPoints: number[];
+  yMin?: string;
+  yMax?: string;
+  months?: string[];
+  chartId?: string;
+}
+
+const {
+  dataPoints = [40, 50, 60, 55, 65, 75, 70, 80, 85, 90, 88, 95],
+  yMin = "$7.5k",
+  yMax = "$30k",
+  months = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+  chartId = Math.random().toString(36).substring(2, 9)
+} = Astro.props;
+
+// SVG canvas dimensions
+const width = 360;
+const height = 110;
+const paddingLeft = 45;
+const paddingRight = 10;
+const paddingTop = 15;
+const paddingBottom = 28;
+
+const chartWidth = width - paddingLeft - paddingRight;
+const chartHeight = height - paddingTop - paddingBottom;
+
+// Compute point coordinates
+const points = dataPoints.map((val, i) => {
+  const x = paddingLeft + (i / (dataPoints.length - 1)) * chartWidth;
+  const clampedVal = Math.max(0, Math.min(100, val));
+  const y = paddingTop + chartHeight - (clampedVal / 100) * chartHeight;
+  return { x, y };
+});
+
+// Build smooth cubic bezier curve path
+function createSmoothPath(pts: { x: number; y: number }[]) {
+  if (pts.length === 0) return "";
+  let d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+  
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(pts.length - 1, i + 2)];
+
+    const cp1x = p1.x + (p2.x - p0.x) / 6;
+    const cp1y = p1.y + (p2.y - p0.y) / 6;
+    const cp2x = p2.x - (p3.x - p1.x) / 6;
+    const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+    d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+  }
+  return d;
+}
+
+const linePath = createSmoothPath(points);
+const lastPt = points[points.length - 1];
+const firstPt = points[0];
+const fillPath = `${linePath} L ${lastPt.x.toFixed(1)},${(paddingTop + chartHeight).toFixed(1)} L ${firstPt.x.toFixed(1)},${(paddingTop + chartHeight).toFixed(1)} Z`;
+
+// Grid line positions
+const gridY1 = paddingTop + chartHeight * 0.25;
+const gridY2 = paddingTop + chartHeight * 0.75;
+const gradientId = `amber-grad-${chartId}`;
+---
+
+<div class="mini-chart-container">
+  <svg viewBox={`0 0 ${width} ${height}`} class="mini-chart-svg" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#F5B52B" stop-opacity="0.38"></stop>
+        <stop offset="60%" stop-color="#F5B52B" stop-opacity="0.12"></stop>
+        <stop offset="100%" stop-color="#F5B52B" stop-opacity="0.0"></stop>
+      </linearGradient>
+    </defs>
+
+    <!-- Subtle horizontal dashed grid lines -->
+    <line x1={paddingLeft} y1={gridY1} x2={width - paddingRight} y2={gridY1} stroke="#E5E7EB" stroke-dasharray="3 3" stroke-width="1"></line>
+    <line x1={paddingLeft} y1={gridY2} x2={width - paddingRight} y2={gridY2} stroke="#E5E7EB" stroke-dasharray="3 3" stroke-width="1"></line>
+
+    <!-- Y-axis Min/Max Labels -->
+    <text x="0" y={paddingTop + 4} class="chart-axis-text">{yMax}</text>
+    <text x="0" y={paddingTop + chartHeight - 2} class="chart-axis-text">{yMin}</text>
+
+    <!-- Pale Amber Area Fill -->
+    <path d={fillPath} fill={`url(#${gradientId})`}></path>
+
+    <!-- Thin Amber Curve Stroke -->
+    <path d={linePath} fill="none" stroke="#F5B52B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
+
+    <!-- X-axis 12-Month Labels -->
+    {months.map((month, idx) => {
+      const xPos = paddingLeft + (idx / (months.length - 1)) * chartWidth;
+      return (
+        <text x={xPos} y={height - 6} text-anchor="middle" class="chart-month-text">
+          {month}
+        </text>
+      );
+    })}
+  </svg>
+</div>
+
+<style>
+  .mini-chart-container {
+    width: 100%;
+    margin-top: 0.75rem;
+  }
+  .mini-chart-svg {
+    width: 100%;
+    height: 105px;
+    display: block;
+    overflow: visible;
+  }
+  .chart-axis-text {
+    font-size: 10px;
+    fill: #8E8E93;
+    font-weight: 500;
+    font-family: inherit;
+  }
+  .chart-month-text {
+    font-size: 9.5px;
+    fill: #9CA3AF;
+    font-weight: 400;
+    font-family: inherit;
+  }
+</style>
