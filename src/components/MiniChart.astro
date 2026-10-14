@@ -4,14 +4,16 @@ interface Props {
   yMin?: string;
   yMax?: string;
   months?: string[];
+  rawCounts?: number[];
   chartId?: string;
 }
 
 const {
   dataPoints = [40, 50, 60, 55, 65, 75, 70, 80, 85, 90, 88, 95],
-  yMin = "$7.5k",
-  yMax = "$30k",
+  yMin = "0",
+  yMax = "1.2k Active",
   months = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"],
+  rawCounts = [],
   chartId = Math.random().toString(36).substring(2, 9)
 } = Astro.props;
 
@@ -90,6 +92,31 @@ const gradientId = `amber-grad-${chartId}`;
     <!-- Thin Amber Curve Stroke -->
     <path d={linePath} fill="none" stroke="#F5B52B" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path>
 
+    <!-- Interactive Data Points & Native Tooltips -->
+    {points.map((pt, idx) => {
+      const month = months[idx] || '';
+      const count = rawCounts[idx] !== undefined ? rawCounts[idx] : dataPoints[idx];
+      const countText = typeof count === 'number' ? count.toLocaleString() : count;
+      const tooltip = `${month}: ${countText} active users`;
+      return (
+        <g class="chart-point-group">
+          <title>{tooltip}</title>
+          <circle 
+            cx={pt.x.toFixed(1)} 
+            cy={pt.y.toFixed(1)} 
+            r="3.5" 
+            class="chart-point-dot" 
+          />
+          <circle 
+            cx={pt.x.toFixed(1)} 
+            cy={pt.y.toFixed(1)} 
+            r="12" 
+            class="chart-point-hitarea" 
+          />
+        </g>
+      );
+    })}
+
     <!-- X-axis 12-Month Labels -->
     {months.map((month, idx) => {
       const xPos = paddingLeft + (idx / (months.length - 1)) * chartWidth;
@@ -124,5 +151,25 @@ const gradientId = `amber-grad-${chartId}`;
     fill: #9CA3AF;
     font-weight: 400;
     font-family: inherit;
+  }
+  .chart-point-dot {
+    fill: #F5B52B;
+    stroke: #ffffff;
+    stroke-width: 1.5px;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform-origin: center;
+  }
+  .mini-chart-container:hover .chart-point-dot {
+    opacity: 0.55;
+  }
+  .chart-point-group:hover .chart-point-dot {
+    opacity: 1;
+    transform: scale(1.4);
+    fill: #D97706;
+  }
+  .chart-point-hitarea {
+    fill: transparent;
+    cursor: pointer;
   }
 </style>

@@ -1,0 +1,421 @@
+---
+import { profileData } from '../data/profile';
+---
+
+<div 
+  class="resume-modal-backdrop" 
+  id="resumeModalBackdrop" 
+  aria-hidden="true" 
+  role="dialog" 
+  aria-modal="true" 
+  aria-labelledby="resumeModalTitle"
+>
+  <div class="resume-modal-card" id="resumeModalCard">
+    <!-- Header -->
+    <div class="resume-modal-header">
+      <div class="resume-title-group">
+        <div class="resume-icon-badge">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+        </div>
+        <div>
+          <h2 id="resumeModalTitle" class="resume-modal-title">{profileData.name} — Resume</h2>
+          <p class="resume-modal-subtitle">Curriculum Vitae &middot; B.Tech CSE (AI &amp; ML)</p>
+        </div>
+      </div>
+
+      <button type="button" class="resume-close-btn" id="resumeCloseBtn" aria-label="Close resume preview">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body / PDF Preview -->
+    <div class="resume-modal-body">
+      <div class="resume-viewer-wrapper">
+        <iframe
+          src="/Resume.pdf#toolbar=0&navpanes=0&view=FitH"
+          class="resume-iframe"
+          title={`${profileData.name} Resume Preview`}
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
+
+    <!-- Footer Toolbar with Download & Open Options -->
+    <div class="resume-modal-footer">
+      <div class="footer-hint">
+        <span class="desktop-hint">Verified developer curriculum vitae</span>
+        <span class="mobile-hint">Tap below to download or view full PDF</span>
+      </div>
+
+      <div class="footer-actions">
+        <a
+          href="/Resume.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="resume-action-secondary"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+          <span>Open Full Tab</span>
+        </a>
+
+        <a
+          href="/Resume.pdf"
+          download="Sujoy_Moulick_Resume.pdf"
+          class="resume-action-primary"
+          id="resumeDownloadBtn"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Download PDF</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .resume-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  .resume-modal-backdrop.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .resume-modal-card {
+    background-color: var(--card-bg, #ffffff);
+    border: 1px solid var(--card-border, rgba(0, 0, 0, 0.1));
+    border-radius: 20px;
+    width: 100%;
+    max-width: 860px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    transform: scale(0.96) translateY(10px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .resume-modal-backdrop.is-open .resume-modal-card {
+    transform: scale(1) translateY(0);
+  }
+
+  /* Header */
+  .resume-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid var(--card-border, rgba(0, 0, 0, 0.08));
+    gap: 1rem;
+  }
+
+  .resume-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .resume-icon-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: rgba(245, 181, 43, 0.16);
+    color: var(--accent-amber, #F5B52B);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .resume-modal-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main, #111827);
+    margin: 0;
+    line-height: 1.25;
+  }
+
+  .resume-modal-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted, #6B7280);
+    margin: 0.2rem 0 0 0;
+    font-weight: 400;
+  }
+
+  .resume-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted, #6B7280);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .resume-close-btn:hover {
+    color: var(--text-main, #111827);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  html.dark .resume-close-btn:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Body */
+  .resume-modal-body {
+    padding: 0.75rem 1.25rem;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .resume-viewer-wrapper {
+    width: 100%;
+    height: 64vh;
+    min-height: 340px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--card-border, rgba(0, 0, 0, 0.1));
+    background-color: #ffffff;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .resume-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* Footer */
+  .resume-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.4rem;
+    border-top: 1px solid var(--card-border, rgba(0, 0, 0, 0.08));
+    gap: 1rem;
+    background-color: rgba(0, 0, 0, 0.015);
+  }
+
+  html.dark .resume-modal-footer {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  .footer-hint {
+    font-size: 0.825rem;
+    color: var(--text-muted, #6B7280);
+  }
+
+  .mobile-hint {
+    display: none;
+  }
+
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .resume-action-primary {
+    background-color: var(--accent-amber, #F5B52B);
+    color: #111827;
+    font-weight: 700;
+    font-size: 0.875rem;
+    padding: 0.6rem 1.15rem;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+    box-shadow: 0 2px 6px rgba(245, 181, 43, 0.3);
+  }
+
+  .resume-action-primary:hover {
+    background-color: var(--accent-amber-hover, #E0A221);
+  }
+
+  .resume-action-primary:active {
+    transform: scale(0.98);
+  }
+
+  .resume-action-secondary {
+    background-color: transparent;
+    color: var(--text-main, #111827);
+    border: 1px solid var(--card-border, rgba(0, 0, 0, 0.15));
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .resume-action-secondary:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  html.dark .resume-action-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+
+  /* Mobile Responsive Optimizations */
+  @media (max-width: 768px) {
+    .resume-modal-backdrop {
+      padding: 0;
+      align-items: flex-end;
+    }
+
+    .resume-modal-card {
+      max-height: 94vh;
+      border-radius: 20px 20px 0 0;
+      border-bottom: none;
+      padding-bottom: env(safe-area-inset-bottom, 10px);
+      transform: translateY(100%);
+    }
+
+    .resume-modal-backdrop.is-open .resume-modal-card {
+      transform: translateY(0);
+    }
+
+    .resume-modal-header {
+      padding: 1rem 1.1rem;
+    }
+
+    .resume-modal-body {
+      padding: 0.5rem 0.9rem;
+    }
+
+    .resume-viewer-wrapper {
+      height: 54vh;
+      min-height: 250px;
+    }
+
+    .resume-modal-footer {
+      flex-direction: column;
+      align-items: stretch;
+      padding: 0.9rem 1.1rem;
+      gap: 0.75rem;
+    }
+
+    .desktop-hint {
+      display: none;
+    }
+
+    .mobile-hint {
+      display: block;
+      text-align: center;
+      font-size: 0.775rem;
+    }
+
+    .footer-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.65rem;
+      width: 100%;
+    }
+
+    .resume-action-primary,
+    .resume-action-secondary {
+      justify-content: center;
+      padding: 0.7rem 0.8rem;
+      font-size: 0.85rem;
+    }
+  }
+</style>
+
+<script>
+  function setupResumeModal() {
+    const backdrop = document.getElementById('resumeModalBackdrop');
+    const closeBtn = document.getElementById('resumeCloseBtn');
+
+    function openModal(e?: Event) {
+      if (e) e.preventDefault();
+      if (!backdrop) return;
+      backdrop.classList.add('is-open');
+      backdrop.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      if (!backdrop) return;
+      backdrop.classList.remove('is-open');
+      backdrop.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    // Attach to all elements with data-open-resume-modal
+    document.querySelectorAll('[data-open-resume-modal]').forEach((trigger) => {
+      trigger.removeEventListener('click', openModal);
+      trigger.addEventListener('click', openModal);
+    });
+
+    closeBtn?.removeEventListener('click', closeModal);
+    closeBtn?.addEventListener('click', closeModal);
+
+    backdrop?.addEventListener('click', (e) => {
+      if (e.target === backdrop) {
+        closeModal();
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && backdrop?.classList.contains('is-open')) {
+        closeModal();
+      }
+    });
+  }
+
+  // Setup on initial load & view transitions
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupResumeModal);
+  } else {
+    setupResumeModal();
+  }
+  document.addEventListener('astro:page-load', setupResumeModal);
+</script>

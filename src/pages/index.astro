@@ -2,9 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 import ProfilePanel from '../components/ProfilePanel.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import ResumeModal from '../components/ResumeModal.astro';
 import MotionGrid from '../components/ui/motion-grid';
-import { projectsData } from '../data/projects';
+import { getProjectsData } from '../data/projects';
 import '../styles/global.css';
+
+const projects = await getProjectsData();
 ---
 
 <Layout title="Sujoy Moulick — Full-Stack Developer & Indie Hacker Portfolio">
@@ -22,11 +25,14 @@ import '../styles/global.css';
       <!-- Right Column: 2-Column Project Dashboard -->
       <section class="dashboard-section" aria-label="Projects Dashboard">
         <div class="dashboard-grid">
-          {projectsData.map((project) => (
+          {projects.map((project) => (
             <ProjectCard project={project} />
           ))}
         </div>
       </section>
     </div>
   </main>
+
+  <!-- Resume Preview & Download Modal (Desktop & Mobile) -->
+  <ResumeModal />
 </Layout>

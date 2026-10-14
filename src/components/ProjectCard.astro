@@ -45,6 +45,8 @@ const isImageLogo = project.icon.startsWith('/') || project.icon.includes('.');
         dataPoints={project.dataPoints} 
         yMin={project.yMin} 
         yMax={project.yMax} 
+        months={project.months}
+        rawCounts={project.rawCounts}
         chartId={project.id}
       />
     </div>
