@@ -32,8 +32,18 @@ const isImageLogo = project.icon.startsWith('/') || project.icon.includes('.');
         </div>
       </div>
 
-      <div class="card-badge">
-        <span class="badge-text">{project.badge}</span>
+      <div class="card-badges-wrapper">
+        {project.isClerkVerified && (
+          <div class="clerk-verified-badge" title="Active user metrics verified by Clerk">
+            <svg class="clerk-verified-icon" width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53-1.471-1.47a.75.75 0 00-1.06 1.06l2.121 2.122a.75.75 0 001.14-.094l3.726-5.276z" />
+            </svg>
+            <span class="clerk-badge-text">Verified by Clerk</span>
+          </div>
+        )}
+        <div class="card-badge">
+          <span class="badge-text">{project.badge}</span>
+        </div>
       </div>
     </div>
 
@@ -131,6 +141,48 @@ const isImageLogo = project.icon.startsWith('/') || project.icon.includes('.');
     margin: 0;
     letter-spacing: -0.015em;
     line-height: 1.2;
+  }
+
+  .card-badges-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .clerk-verified-badge {
+    background-color: rgba(99, 102, 241, 0.08);
+    color: #4F46E5;
+    border: 1px solid rgba(99, 102, 241, 0.22);
+    padding: 0.2rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+  }
+
+  html.dark .clerk-verified-badge {
+    background-color: rgba(99, 102, 241, 0.16);
+    color: #818CF8;
+    border-color: rgba(99, 102, 241, 0.32);
+  }
+
+  .clerk-verified-icon {
+    width: 11px;
+    height: 11px;
+    color: #4F46E5;
+    flex-shrink: 0;
+  }
+
+  html.dark .clerk-verified-icon {
+    color: #818CF8;
   }
 
   .card-badge {
